@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud Gallery — UPP Cómputo en la Nube</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <style>
+    :root {
+      --bg: #08090d;
+      --surface: #0f111a;
+      --card: #151824;
+      --border: #222638;
+      --border-hover: #313752;
+      --accent: #a394ff; /* Un lila/morado pastel más chic */
+      --accent-glow: rgba(163, 148, 255, 0.15);
+      --accent2: #46c8a0;
+      --text: #f3f4f6;
+      --muted: #7e84a3;
+      --danger: #ff6b6b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15, 17, 26, 0.8);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #7c6af7, var(--accent2));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(124, 106, 247, 0.25);
+    }
+
+    .logo h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      background: linear-gradient(to right, #fff, #b9bedb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent2);
+      display: block;
+      margin-top: 1px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      gap: 0.6rem;
+      background: var(--surface);
+      padding: 4px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+
+    .tag-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 0.45rem 1.2rem;
+      border-radius: 999px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tag-btn:hover {
+      color: var(--text);
+    }
+
+    .tag-btn.active {
+      background: var(--text);
+      color: var(--bg);
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    }
+
+    /* ── Upload zone ── */
+    .upload-zone {
+      margin: 2.5rem auto 1.5rem;
+      max-width: 1000px;
+      padding: 0 1.5rem;
+    }
+
+    .drop-area {
+      border: 1px dashed var(--border);
+      border-radius: 20px;
+      padding: 3.5rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .drop-area::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .drop-area:hover, .drop-area.dragover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .drop-area:hover::before, .drop-area.dragover::before {
+      opacity: 1;
+    }
+
+    .drop-area .icon {
+      font-size: 2rem;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .drop-area p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .drop-area p strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .drop-area .specs {
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      opacity: 0.8;
+    }
+
+    #fileInput { display: none; }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      max-width: 1000px;
+      margin: 0 auto 1.5rem;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stats-bar p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .stats-bar p span {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 2px;
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .view-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .view-btn:hover {
+      color: var(--text);
+    }
+
+    .view-btn.active {
+      background: var(--card);
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Gallery Grid ── */
+    .gallery {
+      max-width: 1000px;
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+      transition: all 0.3s;
+    }
+
+    .gallery.list-view {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── Card ── */
+    .img-card {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: cardIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .img-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-hover);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .img-card .thumb-wrapper {
+      width: 100%;
+      aspect-ratio: 16/11;
+      overflow: hidden;
+      background: var(--surface);
+      position: relative;
+    }
+
+    .img-card .thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .img-card:hover .thumb {
+      transform: scale(1.04);
+    }
+
+    .img-card .thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--surface) 0%, #171a29 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--muted);
+    }
+
+    .img-card .card-body {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .img-card .card-info {
+      min-width: 0; /* Evita que el texto rompa el flex */
+    }
+
+    .img-card .card-info h3 {
+      font-size: 0.92rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+    }
+
+    .img-card .card-info p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      margin-top: 4px;
+    }
+
+    .img-card .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .img-card .delete-btn:hover { 
+      color: var(--danger); 
+      background: rgba(255, 107, 107, 0.1); 
+    }
+
+    /* List view card */
+    .gallery.list-view .img-card {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 0.75rem;
+    }
+
+    .gallery.list-view .img-card .thumb-wrapper {
+      width: 90px;
+      height: 68px;
+      aspect-ratio: auto;
+      flex-shrink: 0;
+      border-radius: 10px;
+    }
+
+    .gallery.list-view .img-card .card-body {
+      flex: 1;
+      padding: 0;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 4rem 1.5rem;
+      text-align: center;
+    }
+
+    .empty-state .big-icon { 
+      font-size: 2.5rem; 
+      color: var(--muted); 
+      margin-bottom: 1.5rem;
+      opacity: 0.6;
+    }
+    
+    .empty-state h2 { 
+      font-family: 'Outfit', sans-serif; 
+      font-size: 1.35rem; 
+      font-weight: 500; 
+      margin-bottom: 0.5rem; 
+      color: var(--text);
+    }
+    
+    .empty-state p { 
+      color: var(--muted); 
+      font-size: 0.9rem; 
+      line-height: 1.5;
+    }
+
+    /* ── Lightbox ── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 8, 0.92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .lightbox.open { display: flex; animation: fadeIn 0.25s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 80vh;
+      border-radius: 16px;
+      object-fit: contain;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.7);
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .lightbox-close:hover {
+      border-color: var(--muted);
+      transform: scale(1.05);
+    }
+
+    .lightbox-info {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .lightbox-info strong { 
+      color: var(--text); 
+      display: block; 
+      font-family: 'Outfit', sans-serif; 
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-bottom: 4px; 
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.02em;
+    }
+
+    footer a { 
+      color: var(--text); 
+      text-decoration: none; 
+      border-bottom: 1px dashed var(--muted);
+      transition: all 0.2s;
+    }
+    
+    footer a:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"><i class="fa-solid fa-cloud"></i></div>
+    <div>
+      <h1>Cloud Gallery</h1>
+      <span>UPP · Cómputo en la Nube · 8vo sem.</span>
+    </div>
+  </div>
+  <nav id="tagNav">
+    <button class="tag-btn active" data-tag="all">Todas</button>
+  </nav>
+</header>
+
+<div class="upload-zone">
+  <div class="drop-area" id="dropArea">
+    <div class="icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+    <p>Arrastra imágenes aquí o <strong>haz clic para seleccionar</strong></p>
+    <p class="specs">JPG, PNG, GIF, WEBP · Máx. 10 MB</p>
+    <input type="file" id="fileInput" accept="image/*" multiple />
+  </div>
+</div>
+
+<div class="stats-bar">
+  <p id="statsText"><span id="imgCount">0</span> imágenes en la galería</p>
+  <div class="view-toggle">
+    <button class="view-btn active" id="gridBtn" title="Vista cuadrícula"><i class="fa-solid fa-table-cells-large"></i></button>
+    <button class="view-btn" id="listBtn" title="Vista lista"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</div>
+
+<div class="gallery" id="gallery"></div>
+
+<div class="empty-state" id="emptyState">
+  <div class="big-icon"><i class="fa-regular fa-image"></i></div>
+  <h2>Tu galería está vacía</h2>
+  <p>Sube tus primeras imágenes usando la zona de arriba.<br/>Soportamos múltiples archivos simultáneos.</p>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lbClose"><i class="fa-solid fa-xmark"></i></button>
+  <img id="lbImg" src="" alt="" />
+  <div class="lightbox-info">
+    <strong id="lbName"></strong>
+    <span id="lbMeta"></span>
+  </div>
+</div>
+
+<footer>
+  Proyecto demo · <a href="https://github.com" target="_blank">Ver en GitHub</a> · Desplegado con GitHub Actions <i class="fa-solid fa-rocket" style="margin-left: 2px; font-size: 0.7rem; color: var(--accent);"></i>
+</footer>
+
+<script>
+  const gallery    = document.getElementById('gallery');
+  const emptyState = document.getElementById('emptyState');
+  const dropArea   = document.getElementById('dropArea');
+  const fileInput  = document.getElementById('fileInput');
+  const imgCount   = document.getElementById('imgCount');
+  const lightbox   = document.getElementById('lightbox');
+  const lbImg      = document.getElementById('lbImg');
+  const lbName     = document.getElementById('lbName');
+  const lbMeta     = document.getElementById('lbMeta');
+  const tagNav     = document.getElementById('tagNav');
+
+  let images = JSON.parse(localStorage.getItem('cloudGallery') || '[]');
+  let activeTag = 'all';
+  let isListView = false;
+
+  function save() { localStorage.setItem('cloudGallery', JSON.stringify(images)); }
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/1048576).toFixed(1) + ' MB';
+  }
+
+  function inferTag(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    if (['jpg','jpeg'].includes(ext)) return 'JPEG';
+    if (ext === 'png') return 'PNG';
+    if (ext === 'gif') return 'GIF';
+    if (ext === 'webp') return 'WebP';
+    return 'IMG';
+  }
+
+  function updateTagNav() {
+    const tags = ['all', ...new Set(images.map(i => i.tag))];
+    tagNav.innerHTML = tags.map(t => `
+      <button class="tag-btn ${t === activeTag ? 'active' : ''}" data-tag="${t}">
+        ${t === 'all' ? 'Todas' : t}
+      </button>
+    `).join('');
+    tagNav.querySelectorAll('.tag-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeTag = btn.dataset.tag;
+        renderGallery();
+      });
+    });
+  }
+
+  function renderGallery() {
+    const filtered = activeTag === 'all' ? images : images.filter(i => i.tag === activeTag);
+    imgCount.textContent = images.length;
+
+    if (filtered.length === 0) {
+      gallery.innerHTML = '';
+      emptyState.style.display = 'block';
+      updateTagNav();
+      return;
+    }
+    emptyState.style.display = 'none';
+    updateTagNav();
+
+    gallery.innerHTML = filtered.map((img, idx) => `
+      <div class="img-card" data-idx="${images.indexOf(img)}">
+        <div class="thumb-wrapper">
+          ${img.src
+            ? `<img class="thumb" src="${img.src}" alt="${img.name}" loading="lazy" />`
+            : `<div class="thumb-placeholder"><i class="fa-regular fa-image"></i></div>`}
+        </div>
+        <div class="card-body">
+          <div class="card-info">
+            <h3>${img.name}</h3>
+            <p>${formatSize(img.size)} · ${img.tag} · ${img.date}</p>
+          </div>
+          <button class="delete-btn" data-idx="${images.indexOf(img)}" title="Eliminar">
+            <i class="fa-regular fa-trash-can"></i>
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    gallery.querySelectorAll('.img-card').forEach(card => {
+      card.addEventListener('click', e => {
+        if (e.target.closest('.delete-btn')) return; // Modificado para soportar el nodo del icono interno
+        const idx = card.dataset.idx;
+        openLightbox(images[idx]);
+      });
+    });
+
+    gallery.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const idx = parseInt(btn.closest('.delete-btn').dataset.idx);
+        images.splice(idx, 1);
+        save();
+        renderGallery();
+      });
+    });
+  }
+
+  function openLightbox(img) {
+    lbImg.src = img.src;
+    lbName.textContent = img.name;
+    lbMeta.textContent = `${formatSize(img.size)} · ${img.tag} · Subida el ${img.date}`;
+    lightbox.classList.add('open');
+  }
+
+  document.getElementById('lbClose').addEventListener('click', () => lightbox.classList.remove('open'));
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.classList.remove('open'); });
+
+  document.getElementById('gridBtn').addEventListener('click', () => {
+    isListView = false;
+    gallery.classList.remove('list-view');
+    document.getElementById('gridBtn').classList.add('active');
+    document.getElementById('listBtn').classList.remove('active');
+  });
+  document.getElementById('listBtn').addEventListener('click', () => {
+    isListView = true;
+    gallery.classList.add('list-view');
+    document.getElementById('listBtn').classList.add('active');
+    document.getElementById('gridBtn').classList.remove('active');
+  });
+
+  function processFiles(files) {
+    const toProcess = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (!toProcess.length) return;
+    let done = 0;
+    toProcess.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        images.unshift({
+          name: file.name,
+          size: file.size,
+          tag:  inferTag(file.name),
+          date: new Date().toLocaleDateString('es-MX', {day:'2-digit', month:'short', year:'numeric'}),
+          src:  e.target.result
+        });
+        done++;
+        if (done === toProcess.length) { save(); renderGallery(); }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  dropArea.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => processFiles(e.target.files));
+  dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
+  dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+  dropArea.addEventListener('drop', e => {
+    e.preventDefault();
+    dropArea.classList.remove('dragover');
+    processFiles(e.dataTransfer.files);
+  });
+
+  renderGallery();
+</script>
+</body>
+</html>
