@@ -1,0 +1,89 @@
+name: Deploy Cloud Gallery to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:        # permite ejecución manual desde la UI de GitHub
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # ── Job 1: Validar el código ──────────────────────────────────────────────
+  lint-and-test:
+    name: 🔍 Lint & Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Verificar que index.html existe
+        run: |
+          if [ ! -f "index.html" ]; then
+            echo "❌ index.html no encontrado"
+            exit 1
+          fi
+          echo "✅ index.html encontrado ($(wc -c < index.html) bytes)"
+
+      - name: Validar estructura HTML básica
+        run: |
+          if grep -q "<!DOCTYPE html>" index.html; then
+            echo "✅ DOCTYPE declarado"
+          else
+            echo "⚠️  DOCTYPE faltante"
+          fi
+          if grep -q "<title>" index.html; then
+            echo "✅ <title> presente"
+          else
+            echo "❌ <title> faltante"
+            exit 1
+          fi
+          if grep -q "<meta name=\"viewport\"" index.html; then
+            echo "✅ viewport meta presente (responsive)"
+          else
+            echo "⚠️  viewport meta faltante"
+          fi
+
+  # ── Job 2: Build (si existiera un proceso de build) ───────────────────────
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar artefactos para deploy
+        run: |
+          echo "📦 Preparando archivos estáticos..."
+          ls -la
+          echo "✅ Build completado (HTML/CSS/JS estático, sin compilación necesaria)"
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Subir artefacto a Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'     # sube todo el contenido del repo
+
+  # ── Job 3: Deploy a GitHub Pages ──────────────────────────────────────────
+  deploy:
+    name: 🚀 Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Desplegar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
