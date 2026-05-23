@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud Gallery — UPP Cómputo en la Nube</title>
+  <script src="auth.js"></script>
+  <script>
+    // Bloquear acceso si no hay sesión
+    (function() {
+      const s = sessionStorage.getItem("cloud_gallery_session");
+      if (!s) window.location.href = "login.html";
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --surface: #13151c;
+      --card: #1a1d28;
+      --border: #2a2d3e;
+      --accent: #7c6af7;
+      --accent2: #46c8a0;
+      --text: #e8e9f0;
+      --muted: #6b6f8a;
+      --danger: #f06060;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+
+    .logo span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent2);
+      display: block;
+      margin-top: -2px;
+    }
+
+    nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .tag-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tag-btn:hover, .tag-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Upload zone ── */
+    .upload-zone {
+      margin: 2rem auto;
+      max-width: 960px;
+      padding: 0 1.5rem;
+    }
+
+    .drop-area {
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      background: var(--card);
+    }
+
+    .drop-area:hover, .drop-area.dragover {
+      border-color: var(--accent);
+      background: rgba(124, 106, 247, 0.06);
+    }
+
+    .drop-area .icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .drop-area p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .drop-area p strong {
+      color: var(--accent);
+    }
+
+    #fileInput { display: none; }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      max-width: 960px;
+      margin: 0 auto 1.5rem;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stats-bar p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .stats-bar p span {
+      color: var(--accent2);
+      font-weight: 500;
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--card);
+      border-radius: 8px;
+      padding: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .view-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: all 0.15s;
+    }
+
+    .view-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Gallery Grid ── */
+    .gallery {
+      max-width: 960px;
+      margin: 0 auto 3rem;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+      transition: all 0.3s;
+    }
+
+    .gallery.list-view {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── Card ── */
+    .img-card {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      animation: cardIn 0.35s ease both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.97); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .img-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 32px rgba(124, 106, 247, 0.15);
+    }
+
+    .img-card .thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+      background: var(--surface);
+    }
+
+    .img-card .thumb-placeholder {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, var(--surface) 0%, #1e2035 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+
+    .img-card .card-body {
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .img-card .card-info h3 {
+      font-size: 0.88rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+
+    .img-card .card-info p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      margin-top: 2px;
+    }
+
+    .img-card .delete-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.15s;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .img-card .delete-btn:hover { color: var(--danger); background: rgba(240,96,96,0.1); }
+
+    /* List view card */
+    .gallery.list-view .img-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .gallery.list-view .img-card .thumb,
+    .gallery.list-view .img-card .thumb-placeholder {
+      width: 100px;
+      aspect-ratio: 4/3;
+      flex-shrink: 0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .gallery.list-view .img-card .card-body {
+      flex: 1;
+      padding: 0.75rem 1rem 0.75rem 0;
+    }
+
+    .gallery.list-view .img-card .card-info h3 {
+      max-width: none;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+
+    .empty-state .big-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .empty-state h2 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 400; margin-bottom: 0.5rem; }
+    .empty-state p { color: var(--muted); font-size: 0.9rem; }
+
+    /* ── Lightbox ── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      backdrop-filter: blur(6px);
+    }
+
+    .lightbox.open { display: flex; }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 12px;
+      object-fit: contain;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-info {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      text-align: center;
+    }
+
+    .lightbox-info strong { color: var(--text); display: block; font-family: 'Outfit', sans-serif; margin-bottom: 2px; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    footer a { color: var(--accent2); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">☁️</div>
+    <div>
+      <h1>Cloud Gallery</h1>
+      <span>UPP · Cómputo en la Nube · 8vo sem.</span>
+    </div>
+  </div>
+  <nav id="tagNav">
+    <button class="tag-btn active" data-tag="all">Todas</button>
+  </nav>
+  <div style="display:flex;align-items:center;gap:0.75rem;margin-left:1rem;">
+    <span id="userBadge" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--accent2);background:rgba(70,200,160,0.1);border:1px solid rgba(70,200,160,0.25);padding:0.3rem 0.75rem;border-radius:999px;"></span>
+    <button onclick="logout()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:0.3rem 0.75rem;border-radius:999px;font-family:'Outfit',sans-serif;font-size:0.8rem;cursor:pointer;">Salir ↩</button>
+  </div>
+</header>
+
+<div class="upload-zone">
+  <div class="drop-area" id="dropArea">
+    <div class="icon">📤</div>
+    <p>Arrastra imágenes aquí o <strong>haz clic para seleccionar</strong></p>
+    <p style="margin-top:6px; font-size:0.78rem;">JPG, PNG, GIF, WEBP · Máx. 10 MB por imagen</p>
+    <input type="file" id="fileInput" accept="image/*" multiple />
+  </div>
+</div>
+
+<div class="stats-bar">
+  <p id="statsText"><span id="imgCount">0</span> imágenes en tu galería</p>
+  <div class="view-toggle">
+    <button class="view-btn active" id="gridBtn" title="Vista cuadrícula">⊞</button>
+    <button class="view-btn" id="listBtn" title="Vista lista">☰</button>
+  </div>
+</div>
+
+<div class="gallery" id="gallery"></div>
+<div class="empty-state" id="emptyState">
+  <div class="big-icon">🖼️</div>
+  <h2>Tu galería está vacía</h2>
+  <p>Sube tus primeras imágenes usando la zona de arriba.<br/>Soporta múltiples archivos a la vez.</p>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lbClose">✕</button>
+  <img id="lbImg" src="" alt="" />
+  <div class="lightbox-info">
+    <strong id="lbName"></strong>
+    <span id="lbMeta"></span>
+  </div>
+</div>
+
+<footer>
+  Proyecto demo · <a href="https://github.com" target="_blank">Ver en GitHub</a> · Desplegado con GitHub Actions 🚀
+</footer>
+
+<script>
+  const gallery    = document.getElementById('gallery');
+  const emptyState = document.getElementById('emptyState');
+  const dropArea   = document.getElementById('dropArea');
+  const fileInput  = document.getElementById('fileInput');
+  const imgCount   = document.getElementById('imgCount');
+  const lightbox   = document.getElementById('lightbox');
+  const lbImg      = document.getElementById('lbImg');
+  const lbName     = document.getElementById('lbName');
+  const lbMeta     = document.getElementById('lbMeta');
+  const tagNav     = document.getElementById('tagNav');
+
+  let images = JSON.parse(localStorage.getItem('cloudGallery') || '[]');
+  let activeTag = 'all';
+  let isListView = false;
+
+  function save() { localStorage.setItem('cloudGallery', JSON.stringify(images)); }
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/1048576).toFixed(1) + ' MB';
+  }
+
+  function inferTag(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    if (['jpg','jpeg'].includes(ext)) return 'JPEG';
+    if (ext === 'png') return 'PNG';
+    if (ext === 'gif') return 'GIF';
+    if (ext === 'webp') return 'WebP';
+    return 'IMG';
+  }
+
+  function updateTagNav() {
+    const tags = ['all', ...new Set(images.map(i => i.tag))];
+    tagNav.innerHTML = tags.map(t => `
+      <button class="tag-btn ${t === activeTag ? 'active' : ''}" data-tag="${t}">
+        ${t === 'all' ? 'Todas' : t}
+      </button>
+    `).join('');
+    tagNav.querySelectorAll('.tag-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeTag = btn.dataset.tag;
+        renderGallery();
+      });
+    });
+  }
+
+  function renderGallery() {
+    const filtered = activeTag === 'all' ? images : images.filter(i => i.tag === activeTag);
+    imgCount.textContent = images.length;
+
+    if (filtered.length === 0) {
+      gallery.innerHTML = '';
+      emptyState.style.display = 'block';
+      updateTagNav();
+      return;
+    }
+    emptyState.style.display = 'none';
+    updateTagNav();
+
+    gallery.innerHTML = filtered.map((img, idx) => `
+      <div class="img-card" data-idx="${images.indexOf(img)}">
+        ${img.src
+          ? `<img class="thumb" src="${img.src}" alt="${img.name}" loading="lazy" />`
+          : `<div class="thumb-placeholder">🖼️</div>`}
+        <div class="card-body">
+          <div class="card-info">
+            <h3>${img.name}</h3>
+            <p>${formatSize(img.size)} · ${img.tag} · ${img.date}</p>
+          </div>
+          <button class="delete-btn" data-idx="${images.indexOf(img)}" title="Eliminar">🗑</button>
+        </div>
+      </div>
+    `).join('');
+
+    gallery.querySelectorAll('.img-card').forEach(card => {
+      card.addEventListener('click', e => {
+        if (e.target.classList.contains('delete-btn')) return;
+        const idx = card.dataset.idx;
+        openLightbox(images[idx]);
+      });
+    });
+
+    gallery.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.idx);
+        images.splice(idx, 1);
+        save();
+        renderGallery();
+      });
+    });
+  }
+
+  function openLightbox(img) {
+    lbImg.src = img.src;
+    lbName.textContent = img.name;
+    lbMeta.textContent = `${formatSize(img.size)} · ${img.tag} · Subida el ${img.date}`;
+    lightbox.classList.add('open');
+  }
+
+  document.getElementById('lbClose').addEventListener('click', () => lightbox.classList.remove('open'));
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.classList.remove('open'); });
+
+  document.getElementById('gridBtn').addEventListener('click', () => {
+    isListView = false;
+    gallery.classList.remove('list-view');
+    document.getElementById('gridBtn').classList.add('active');
+    document.getElementById('listBtn').classList.remove('active');
+  });
+  document.getElementById('listBtn').addEventListener('click', () => {
+    isListView = true;
+    gallery.classList.add('list-view');
+    document.getElementById('listBtn').classList.add('active');
+    document.getElementById('gridBtn').classList.remove('active');
+  });
+
+  function processFiles(files) {
+    const toProcess = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (!toProcess.length) return;
+    let done = 0;
+    toProcess.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        images.unshift({
+          name: file.name,
+          size: file.size,
+          tag:  inferTag(file.name),
+          date: new Date().toLocaleDateString('es-MX', {day:'2-digit', month:'short', year:'numeric'}),
+          src:  e.target.result
+        });
+        done++;
+        if (done === toProcess.length) { save(); renderGallery(); }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  dropArea.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => processFiles(e.target.files));
+  dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
+  dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+  dropArea.addEventListener('drop', e => {
+    e.preventDefault();
+    dropArea.classList.remove('dragover');
+    processFiles(e.dataTransfer.files);
+  });
+
+  renderGallery();
+
+  // Mostrar usuario en header
+  const session = getSession();
+  if (session) {
+    const badge = document.getElementById("userBadge");
+    if (badge) badge.textContent = session.role === "admin" ? "👑 " + session.name : "👤 " + session.name;
+  }
+</script>
+</body>
+</html>
