@@ -9,17 +9,20 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <style>
     :root {
-      --bg: #08090d;
-      --surface: #0f111a;
-      --card: #151824;
-      --border: #222638;
-      --border-hover: #313752;
-      --accent: #a394ff; /* Un lila/morado pastel más chic */
-      --accent-glow: rgba(163, 148, 255, 0.15);
-      --accent2: #46c8a0;
-      --text: #f3f4f6;
-      --muted: #7e84a3;
-      --danger: #ff6b6b;
+      /* Colores Institucionales UPP Adaptados */
+      --bg: #0b0c10;              /* Negro profundo para fondo general */
+      --surface: #121520;         /* Negro suavizado para zonas de interfaz */
+      --card: #181c2b;            /* Variación oscura para las tarjetas */
+      --border: #232a42;          /* Bordes en tono oscuro sutil */
+      --border-hover: #3b476e;    /* Borde resaltado al pasar el cursor */
+      
+      --accent: #4169e1;          /* Azul Rey Institucional */
+      --accent-glow: rgba(65, 105, 225, 0.15); /* Brillo Azul Rey */
+      --accent2: #e63946;         /* Rojo Institucional para acentos secundarios */
+      
+      --text: #ffffff;            /* Blanco para textos principales */
+      --muted: #8a94a6;           /* Gris/Blanco atenuado para secundarios */
+      --danger: #ff4d4d;          /* Rojo vibrante para eliminar/alertas */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,7 +42,7 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--border);
-      background: rgba(15, 17, 26, 0.8);
+      background: rgba(18, 21, 32, 0.8);
       backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
@@ -55,14 +58,14 @@
     .logo-icon {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, #7c6af7, var(--accent2));
+      background: linear-gradient(135deg, var(--accent), var(--accent2)); /* Degradado Azul Rey a Rojo UPP */
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 16px;
       color: #fff;
-      box-shadow: 0 4px 12px rgba(124, 106, 247, 0.25);
+      box-shadow: 0 4px 12px rgba(65, 105, 225, 0.3);
     }
 
     .logo h1 {
@@ -70,7 +73,7 @@
       font-size: 1.5rem;
       font-weight: 400;
       letter-spacing: -0.01em;
-      background: linear-gradient(to right, #fff, #b9bedb);
+      background: linear-gradient(to right, #fff, #bdf);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -78,7 +81,7 @@
     .logo span {
       font-family: 'DM Mono', monospace;
       font-size: 0.72rem;
-      color: var(--accent2);
+      color: var(--accent2); /* Resaltado en Rojo */
       display: block;
       margin-top: 1px;
       letter-spacing: 0.05em;
@@ -112,10 +115,10 @@
     }
 
     .tag-btn.active {
-      background: var(--text);
-      color: var(--bg);
+      background: var(--text); /* Botón activo en blanco */
+      color: var(--bg);        /* Texto en negro */
       font-weight: 600;
-      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
     }
 
     /* ── Upload zone ── */
@@ -147,7 +150,7 @@
     }
 
     .drop-area:hover, .drop-area.dragover {
-      border-color: var(--accent);
+      border-color: var(--accent); /* Resaltado en Azul Rey */
       transform: translateY(-2px);
     }
 
@@ -157,7 +160,7 @@
 
     .drop-area .icon {
       font-size: 2rem;
-      color: var(--accent);
+      color: var(--accent); /* Icono en Azul Rey */
       margin-bottom: 1.25rem;
       position: relative;
       z-index: 1;
@@ -202,7 +205,7 @@
     }
 
     .stats-bar p span {
-      color: var(--accent);
+      color: var(--accent); /* Contador en Azul Rey */
       font-weight: 500;
     }
 
@@ -236,7 +239,7 @@
 
     .view-btn.active {
       background: var(--card);
-      color: var(--accent);
+      color: var(--accent); /* Icono activo en Azul Rey */
       border: 1px solid var(--border);
     }
 
@@ -274,7 +277,7 @@
     .img-card:hover {
       transform: translateY(-4px);
       border-color: var(--border-hover);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
     }
 
     .img-card .thumb-wrapper {
@@ -300,7 +303,7 @@
     .img-card .thumb-placeholder {
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, var(--surface) 0%, #171a29 100%);
+      background: linear-gradient(135deg, var(--surface) 0%, #1c2236 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -317,7 +320,7 @@
     }
 
     .img-card .card-info {
-      min-width: 0; /* Evita que el texto rompa el flex */
+      min-width: 0;
     }
 
     .img-card .card-info h3 {
@@ -354,7 +357,7 @@
 
     .img-card .delete-btn:hover { 
       color: var(--danger); 
-      background: rgba(255, 107, 107, 0.1); 
+      background: rgba(255, 77, 77, 0.1); 
     }
 
     /* List view card */
@@ -412,7 +415,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(4, 5, 8, 0.92);
+      background: rgba(5, 6, 8, 0.95);
       z-index: 1000;
       align-items: center;
       justify-content: center;
@@ -431,7 +434,7 @@
       max-height: 80vh;
       border-radius: 16px;
       object-fit: contain;
-      box-shadow: 0 24px 70px rgba(0,0,0,0.7);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.8);
     }
 
     .lightbox-close {
@@ -470,7 +473,7 @@
       color: var(--muted);
       font-family: 'DM Mono', monospace;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     }
 
     .lightbox-info strong { 
@@ -556,7 +559,7 @@
 </div>
 
 <footer>
-  Proyecto demo · <a href="https://github.com" target="_blank">Ver en GitHub</a> · Desplegado con GitHub Actions <i class="fa-solid fa-rocket" style="margin-left: 2px; font-size: 0.7rem; color: var(--accent);"></i>
+  Proyecto demo · <a href="https://github.com" target="_blank">Ver en GitHub</a> · Desplegado con GitHub Actions <i class="fa-solid fa-rocket" style="margin-left: 2px; font-size: 0.7rem; color: var(--accent2);"></i>
 </footer>
 
 <script>
@@ -641,7 +644,7 @@
 
     gallery.querySelectorAll('.img-card').forEach(card => {
       card.addEventListener('click', e => {
-        if (e.target.closest('.delete-btn')) return; // Modificado para soportar el nodo del icono interno
+        if (e.target.closest('.delete-btn')) return;
         const idx = card.dataset.idx;
         openLightbox(images[idx]);
       });
