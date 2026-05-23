@@ -61,11 +61,11 @@ jobs:
           chmod 600 ~/.ssh/cloud-gallery-key.pem
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Copiar index.html al EC2 via SCP
+      - name: Copiar archivos al EC2 via SCP
         run: |
           scp -i ~/.ssh/cloud-gallery-key.pem \
-            index.html \
-            ubuntu@${{ secrets.EC2_HOST }}:/tmp/index.html
+            index.html login.html auth.js \
+            ubuntu@${{ secrets.EC2_HOST }}:/tmp/
 
       - name: Instalar Nginx y desplegar en EC2
         run: |
@@ -76,7 +76,7 @@ jobs:
               sudo systemctl enable nginx
             fi
             sudo mkdir -p /var/www/cloud-gallery
-            sudo mv /tmp/index.html /var/www/cloud-gallery/index.html
+            sudo mv /tmp/index.html /tmp/login.html /tmp/auth.js /var/www/cloud-gallery/
             sudo tee /etc/nginx/sites-available/cloud-gallery > /dev/null << 'NGINX'
           server {
               listen 80;
@@ -97,11 +97,11 @@ jobs:
       - name: Verificar que el servidor responde
         run: |
           sleep 10
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 http://${{ secrets.EC2_HOST }})
-          echo "HTTP Status: $STATUS"
-          echo "🌐 URL: http://${{ secrets.EC2_HOST }}"
-
-      - name: Info del deploy
-        run: |
-          echo "🌐 Desplegando a: http://${{ secrets.EC2_HOST }}"
-          echo "📦 Bucket S3: ${{ secrets.S3_BUCKET }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }})
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ Servidor respondiendo correctamente (HTTP $STATUS)"
+            echo "🌐 URL: http://${{ secrets.EC2_HOST }}"
+          else
+            echo "⚠️ Servidor respondió con HTTP $STATUS"
+            exit 1
+          fi
