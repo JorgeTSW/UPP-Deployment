@@ -12,8 +12,6 @@
       if (!s) window.location.href = "login.html";
     })();
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #0b0c10;
@@ -32,7 +30,7 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Outfit', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       min-height: 100vh;
     }
 
@@ -67,14 +65,14 @@
     }
 
     .logo h1 {
-      font-family: 'DM Serif Display', serif;
+      font-family: Georgia, serif;
       font-size: 1.4rem;
       font-weight: 400;
       letter-spacing: -0.02em;
     }
 
     .logo span {
-      font-family: 'DM Mono', monospace;
+      font-family: 'Courier New', monospace;
       font-size: 0.7rem;
       color: var(--accent2);
       display: block;
@@ -92,7 +90,7 @@
       color: var(--muted);
       padding: 0.35rem 0.9rem;
       border-radius: 999px;
-      font-family: 'Outfit', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 0.8rem;
       cursor: pointer;
       transition: all 0.2s;
@@ -155,7 +153,7 @@
     .stats-bar p {
       font-size: 0.82rem;
       color: var(--muted);
-      font-family: 'DM Mono', monospace;
+      font-family: 'Courier New', monospace;
     }
 
     .stats-bar p span {
@@ -263,7 +261,7 @@
     .img-card .card-info p {
       font-size: 0.75rem;
       color: var(--muted);
-      font-family: 'DM Mono', monospace;
+      font-family: 'Courier New', monospace;
       margin-top: 2px;
     }
 
@@ -316,7 +314,7 @@
     }
 
     .empty-state .big-icon { font-size: 4rem; margin-bottom: 1rem; }
-    .empty-state h2 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 400; margin-bottom: 0.5rem; }
+    .empty-state h2 { font-family: Georgia, serif; font-size: 1.8rem; font-weight: 400; margin-bottom: 0.5rem; }
     .empty-state p { color: var(--muted); font-size: 0.9rem; }
 
     /* ── Lightbox ── */
@@ -370,11 +368,11 @@
       padding: 0.75rem 1.25rem;
       font-size: 0.85rem;
       color: var(--muted);
-      font-family: 'DM Mono', monospace;
+      font-family: 'Courier New', monospace;
       text-align: center;
     }
 
-    .lightbox-info strong { color: var(--text); display: block; font-family: 'Outfit', sans-serif; margin-bottom: 2px; }
+    .lightbox-info strong { color: var(--text); display: block; font-family: system-ui, -apple-system, sans-serif; margin-bottom: 2px; }
 
     /* ── Footer ── */
     footer {
@@ -383,7 +381,7 @@
       text-align: center;
       font-size: 0.78rem;
       color: var(--muted);
-      font-family: 'DM Mono', monospace;
+      font-family: 'Courier New', monospace;
     }
 
     footer a { color: var(--accent2); text-decoration: none; }
