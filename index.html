@@ -13,7 +13,6 @@
     })();
   </script>
   <style>
-    /* ── Variables por Defecto: Tema Oscuro ── */
     :root {
       --bg: #0b0c10;
       --surface: #13151c;
@@ -24,23 +23,6 @@
       --text: #e8e9f0;
       --muted: #6b6f8a;
       --danger: #f06060;
-      --shadow: 0 8px 32px rgba(124, 106, 247, 0.15);
-      --lightbox-bg: rgba(0,0,0,0.85);
-    }
-
-    /* ── Variables Alternativas: Tema Claro ── */
-    body.light-theme {
-      --bg: #f8f9fa;
-      --surface: #ffffff;
-      --card: #ffffff;
-      --border: #e2e8f0;
-      --accent: #7c6af7;
-      --accent2: #38b2ac;
-      --text: #0f172a;
-      --muted: #64748b;
-      --danger: #dc2626;
-      --shadow: 0 8px 24px rgba(148, 163, 184, 0.12);
-      --lightbox-bg: rgba(248, 249, 250, 0.95);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -50,7 +32,6 @@
       color: var(--text);
       font-family: system-ui, -apple-system, sans-serif;
       min-height: 100vh;
-      transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
     }
 
     /* ── Header ── */
@@ -120,33 +101,6 @@
       border-color: var(--accent);
       color: #fff;
     }
-
-    /* Botón Conmutador de Tema Claro/Oscuro */
-    .theme-toggle-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.95rem;
-      transition: all 0.2s;
-    }
-
-    .theme-toggle-btn:hover {
-      color: var(--text);
-      border-color: var(--accent);
-    }
-
-    /* Control de iconos según el tema activo */
-    .theme-toggle-btn .fa-sun { display: none; }
-    .theme-toggle-btn .fa-moon { display: block; }
-    body.light-theme .theme-toggle-btn .fa-sun { display: block; }
-    body.light-theme .theme-toggle-btn .fa-moon { display: none; }
 
     /* ── Upload zone ── */
     .upload-zone {
@@ -266,7 +220,7 @@
     .img-card:hover {
       transform: translateY(-3px);
       border-color: var(--accent);
-      box-shadow: var(--shadow);
+      box-shadow: 0 8px 32px rgba(124, 106, 247, 0.15);
     }
 
     .img-card .thumb {
@@ -280,7 +234,7 @@
     .img-card .thumb-placeholder {
       width: 100%;
       aspect-ratio: 4/3;
-      background: linear-gradient(135deg, var(--surface) 0%, var(--border) 100%);
+      background: linear-gradient(135deg, var(--surface) 0%, #1e2035 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -290,7 +244,7 @@
     .img-card .card-body {
       padding: 0.85rem 1rem;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 0.5rem;
     }
@@ -368,7 +322,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: var(--lightbox-bg);
+      background: rgba(0,0,0,0.85);
       z-index: 1000;
       align-items: center;
       justify-content: center;
@@ -383,11 +337,7 @@
       max-height: 85vh;
       border-radius: 12px;
       object-fit: contain;
-      box-shadow: 0 20px 80px rgba(0,0,0,0.4);
-    }
-
-    body.light-theme .lightbox img {
-      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      box-shadow: 0 20px 80px rgba(0,0,0,0.6);
     }
 
     .lightbox-close {
@@ -436,21 +386,12 @@
 
     footer a { color: var(--accent2); text-decoration: none; }
   </style>
-  <script>
-    // Inicializar el tema guardado antes del renderizado para evitar destellos visuales
-    (function() {
-      const savedTheme = localStorage.getItem('cloud_gallery_theme') || 'dark';
-      if (savedTheme === 'light') {
-        document.documentElement.classList.add('early-light'); 
-      }
-    })();
-  </script>
 </head>
 <body>
 
 <header>
   <div class="logo">
-    <div class="logo-icon"><i class="fa-solid fa-cloud"></i></div>
+    <div class="logo-icon">☁️</div>
     <div>
       <h1>Cloud Gallery</h1>
       <span>UPP · Cómputo en la Nube · 8vo sem.</span>
@@ -460,21 +401,14 @@
     <button class="tag-btn active" data-tag="all">Todas</button>
   </nav>
   <div style="display:flex;align-items:center;gap:0.75rem;margin-left:1rem;">
-    <span id="userBadge" style="font-family:system-ui, -apple-system, sans-serif;font-size:0.75rem;color:var(--accent2);background:rgba(70,200,160,0.1);border:1px solid rgba(70,200,160,0.25);padding:0.3rem 0.75rem;border-radius:999px;"></span>
-    
-    <!-- Botón Conmutador de Tema -->
-    <button class="theme-toggle-btn" id="themeToggleBtn" title="Cambiar tema">
-      <i class="fa-solid fa-moon"></i>
-      <i class="fa-solid fa-sun"></i>
-    </button>
-
-    <button onclick="logout()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:0.3rem 0.75rem;border-radius:999px;font-family:system-ui, -apple-system, sans-serif;font-size:0.8rem;cursor:pointer;">Salir <i class="fa-solid fa-arrow-right-from-bracket" style="margin-left:4px; font-size:0.75rem;"></i></button>
+    <span id="userBadge" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--accent2);background:rgba(70,200,160,0.1);border:1px solid rgba(70,200,160,0.25);padding:0.3rem 0.75rem;border-radius:999px;"></span>
+    <button onclick="logout()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:0.3rem 0.75rem;border-radius:999px;font-family:'Outfit',sans-serif;font-size:0.8rem;cursor:pointer;">Salir ↩</button>
   </div>
 </header>
 
 <div class="upload-zone">
   <div class="drop-area" id="dropArea">
-    <div class="icon"><i class="fa-solid fa-cloud-arrow-up" style="color:var(--accent);"></i></div>
+    <div class="icon">📤</div>
     <p>Arrastra imágenes aquí o <strong>haz clic para seleccionar</strong></p>
     <p style="margin-top:6px; font-size:0.78rem;">JPG, PNG, GIF, WEBP · Máx. 10 MB por imagen</p>
     <input type="file" id="fileInput" accept="image/*" multiple />
@@ -484,20 +418,20 @@
 <div class="stats-bar">
   <p id="statsText"><span id="imgCount">0</span> imágenes en tu galería</p>
   <div class="view-toggle">
-    <button class="view-btn active" id="gridBtn" title="Vista cuadrícula"><i class="fa-solid fa-table-cells-large"></i></button>
-    <button class="view-btn" id="listBtn" title="Vista lista"><i class="fa-solid fa-bars"></i></button>
+    <button class="view-btn active" id="gridBtn" title="Vista cuadrícula">⊞</button>
+    <button class="view-btn" id="listBtn" title="Vista lista">☰</button>
   </div>
 </div>
 
 <div class="gallery" id="gallery"></div>
 <div class="empty-state" id="emptyState">
-  <div class="big-icon"><i class="fa-regular fa-image" style="color:var(--muted); opacity:0.5;"></i></div>
+  <div class="big-icon">🖼️</div>
   <h2>Tu galería está vacía</h2>
   <p>Sube tus primeras imágenes usando la zona de arriba.<br/>Soporta múltiples archivos a la vez.</p>
 </div>
 
 <div class="lightbox" id="lightbox">
-  <button class="lightbox-close" id="lbClose"><i class="fa-solid fa-xmark"></i></button>
+  <button class="lightbox-close" id="lbClose">✕</button>
   <img id="lbImg" src="" alt="" />
   <div class="lightbox-info">
     <strong id="lbName"></strong>
@@ -506,16 +440,10 @@
 </div>
 
 <footer>
-  Proyecto demo · <a href="https://github.com" target="_blank">Ver en GitHub</a> · Desplegado con GitHub Actions <i class="fa-solid fa-rocket" style="margin-left:2px; font-size:0.75rem;"></i>
+  Proyecto demo · <a href="https://github.com" target="_blank">Ver en GitHub</a> · Desplegado con GitHub Actions 🚀
 </footer>
 
 <script>
-  // Completar sincronización del script inmediato de cabecera con el cuerpo del documento
-  if (document.documentElement.classList.contains('early-light')) {
-    document.body.classList.add('light-theme');
-    document.documentElement.classList.remove('early-light');
-  }
-
   const gallery    = document.getElementById('gallery');
   const emptyState = document.getElementById('emptyState');
   const dropArea   = document.getElementById('dropArea');
@@ -526,20 +454,21 @@
   const lbName     = document.getElementById('lbName');
   const lbMeta     = document.getElementById('lbMeta');
   const tagNav     = document.getElementById('tagNav');
-  const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-  let images = JSON.parse(localStorage.getItem('cloudGallery') || '[]');
+  let images = [];
   let activeTag = 'all';
   let isListView = false;
 
-  /* ── Manejador de Cambio de Tema ── */
-  themeToggleBtn.addEventListener('click', () => {
-    document.body.classList.toggle('light-theme');
-    const theme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
-    localStorage.setItem('cloud_gallery_theme', theme);
-  });
-
-  function save() { localStorage.setItem('cloudGallery', JSON.stringify(images)); }
+  // ── Cargar imágenes desde S3 via API ─────────────────────────────────────
+  async function loadImages() {
+    try {
+      const res = await fetch('/api/images');
+      images = await res.json();
+      renderGallery();
+    } catch (err) {
+      console.error('Error cargando imágenes:', err);
+    }
+  }
 
   function formatSize(bytes) {
     if (bytes < 1024) return bytes + ' B';
@@ -586,42 +515,48 @@
 
     gallery.innerHTML = filtered.map((img, idx) => `
       <div class="img-card" data-idx="${images.indexOf(img)}">
-        <div class="thumb-wrapper" style="overflow:hidden; position:relative;">
-          ${img.src
-            ? `<img class="thumb" src="${img.src}" alt="${img.name}" loading="lazy" />`
-            : `<div class="thumb-placeholder"><i class="fa-regular fa-image" style="color:var(--muted);"></i></div>`}
-        </div>
+        ${img.url
+          ? `<img class="thumb" src="${img.url}" alt="${img.name}" loading="lazy" />`
+          : `<div class="thumb-placeholder">🖼️</div>`}
         <div class="card-body">
           <div class="card-info">
             <h3>${img.name}</h3>
             <p>${formatSize(img.size)} · ${img.tag} · ${img.date}</p>
           </div>
-          <button class="delete-btn" data-idx="${images.indexOf(img)}" title="Eliminar"><i class="fa-regular fa-trash-can"></i></button>
+          <button class="delete-btn" data-idx="${images.indexOf(img)}" title="Eliminar">🗑</button>
         </div>
       </div>
     `).join('');
 
     gallery.querySelectorAll('.img-card').forEach(card => {
       card.addEventListener('click', e => {
-        if (e.target.closest('.delete-btn')) return;
+        if (e.target.classList.contains('delete-btn')) return;
         const idx = card.dataset.idx;
         openLightbox(images[idx]);
       });
     });
 
     gallery.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', e => {
+      btn.addEventListener('click', async e => {
         e.stopPropagation();
-        const idx = parseInt(btn.closest('.delete-btn').dataset.idx);
-        images.splice(idx, 1);
-        save();
-        renderGallery();
+        const idx = parseInt(btn.dataset.idx);
+        const img = images[idx];
+        try {
+          await fetch('/api/images', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: img.key })
+          });
+          await loadImages();
+        } catch (err) {
+          console.error('Error eliminando:', err);
+        }
       });
     });
   }
 
   function openLightbox(img) {
-    lbImg.src = img.src;
+    lbImg.src = img.url;
     lbName.textContent = img.name;
     lbMeta.textContent = `${formatSize(img.size)} · ${img.tag} · Subida el ${img.date}`;
     lightbox.classList.add('open');
@@ -644,25 +579,26 @@
     document.getElementById('gridBtn').classList.remove('active');
   });
 
-  function processFiles(files) {
+  async function processFiles(files) {
     const toProcess = Array.from(files).filter(f => f.type.startsWith('image/'));
     if (!toProcess.length) return;
-    let done = 0;
-    toProcess.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        images.unshift({
-          name: file.name,
-          size: file.size,
-          tag:  inferTag(file.name),
-          date: new Date().toLocaleDateString('es-MX', {day:'2-digit', month:'short', year:'numeric'}),
-          src:  e.target.result
-        });
-        done++;
-        if (done === toProcess.length) { save(); renderGallery(); }
-      };
-      reader.readAsDataURL(file);
-    });
+
+    for (const file of toProcess) {
+      try {
+        // 1. Pedir URL prefirmada al backend
+        const res = await fetch(`/api/presign?filename=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
+        const { url, key } = await res.json();
+
+        // 2. Subir imagen directo a S3
+        await fetch(url, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+
+        console.log('✅ Imagen subida a S3:', key);
+      } catch (err) {
+        console.error('Error subiendo imagen:', err);
+      }
+    }
+    // 3. Recargar galería desde S3
+    await loadImages();
   }
 
   dropArea.addEventListener('click', () => fileInput.click());
@@ -675,16 +611,13 @@
     processFiles(e.dataTransfer.files);
   });
 
-  renderGallery();
+  loadImages();
 
   // Mostrar usuario en header
   const session = getSession();
   if (session) {
     const badge = document.getElementById("userBadge");
-    if (badge) {
-      const icon = session.role === "admin" ? '<i class="fa-solid fa-crown" style="margin-right:4px;"></i>' : '<i class="fa-solid fa-user" style="margin-right:4px;"></i>';
-      badge.innerHTML = icon + session.name;
-    }
+    if (badge) badge.textContent = session.role === "admin" ? "👑 " + session.name : "👤 " + session.name;
   }
 </script>
 </body>
