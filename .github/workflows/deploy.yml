@@ -100,3 +100,8 @@ jobs:
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 http://${{ secrets.EC2_HOST }})
           echo "HTTP Status: $STATUS"
           echo "🌐 URL: http://${{ secrets.EC2_HOST }}"
+
+      - name: Info del deploy
+        run: |
+          echo "🌐 Desplegando a: http://${{ secrets.EC2_HOST }}"
+          echo "📦 Bucket S3: ${{ secrets.S3_BUCKET }}"
