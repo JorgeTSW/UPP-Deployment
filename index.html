@@ -4,48 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cloud Gallery — UPP Cómputo en la Nube</title>
+  <script src="auth.js"></script>
+  <script>
+    // Bloquear acceso si no hay sesión
+    (function() {
+      const s = sessionStorage.getItem("cloud_gallery_session");
+      if (!s) window.location.href = "login.html";
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
-    /* ── Variables Base: Tema Claro ── */
     :root {
-      --bg: #f8f9fa;
-      --surface: #ffffff;
-      --card: #ffffff;
-      --border: #e2e8f0;
-      --border-hover: #cbd5e1;
-      
-      --accent: #4169e1;          /* Azul Rey Institucional */
-      --accent-glow: rgba(65, 105, 225, 0.08);
-      --accent2: #e63946;         /* Rojo Institucional */
-      
-      --text: #0f172a;
-      --muted: #64748b;
-      --danger: #dc2626;
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.02);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.03);
-      --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.06);
-      --shadow-xl: 0 24px 50px rgba(0, 0, 0, 0.12);
-    }
-
-    /* ── Variables Alternativas: Tema Oscuro ── */
-    body.dark-theme {
       --bg: #0b0c10;
-      --surface: #121520;
-      --card: #181c2b;
-      --border: #232a42;
-      --border-hover: #3b476e;
-      
-      --accent-glow: rgba(65, 105, 225, 0.15);
-      
-      --text: #ffffff;
-      --muted: #8a94a6;
-      --danger: #ff4d4d;
-      --shadow-sm: none;
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
-      --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.6);
-      --shadow-xl: 0 24px 70px rgba(0, 0, 0, 0.8);
+      --surface: #13151c;
+      --card: #1a1d28;
+      --border: #2a2d3e;
+      --accent: #7c6af7;
+      --accent2: #46c8a0;
+      --text: #e8e9f0;
+      --muted: #6b6f8a;
+      --danger: #f06060;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -55,13 +34,11 @@
       color: var(--text);
       font-family: 'Outfit', sans-serif;
       min-height: 100vh;
-      letter-spacing: -0.01em;
-      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
 
     /* ── Header ── */
     header {
-      padding: 1.25rem 2rem;
+      padding: 1.5rem 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -70,199 +47,104 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: var(--shadow-sm);
-    }
-
-    /* Desenfoque de fondo sólo si el navegador lo soporta, adaptado a opacidad de cada tema */
-    @supports (backdrop-filter: blur(12px)) {
-      header {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(12px);
-      }
-      body.dark-theme header {
-        background: rgba(18, 21, 32, 0.8);
-        backdrop-filter: blur(12px);
-      }
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.75rem;
     }
 
     .logo-icon {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      color: #fff;
-      box-shadow: var(--shadow-md);
+      font-size: 18px;
     }
 
     .logo h1 {
       font-family: 'DM Serif Display', serif;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 400;
-      letter-spacing: -0.01em;
-      background: linear-gradient(to right, var(--text), var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
     }
 
     .logo span {
       font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--accent2);
       display: block;
-      margin-top: 1px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    .actions-nav {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+      margin-top: -2px;
     }
 
     nav {
       display: flex;
-      gap: 0.6rem;
-      background: var(--bg);
-      padding: 4px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
+      gap: 0.5rem;
     }
 
     .tag-btn {
       background: transparent;
-      border: none;
+      border: 1px solid var(--border);
       color: var(--muted);
-      padding: 0.45rem 1.2rem;
+      padding: 0.35rem 0.9rem;
       border-radius: 999px;
       font-family: 'Outfit', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 500;
+      font-size: 0.8rem;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .tag-btn:hover {
-      color: var(--text);
-    }
-
-    .tag-btn.active {
-      background: var(--surface);
-      color: var(--accent);
-      font-weight: 600;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--border);
-    }
-
-    /* Botón Conmutador de Tema */
-    .theme-toggle-btn {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
       transition: all 0.2s;
-      box-shadow: var(--shadow-sm);
     }
 
-    .theme-toggle-btn:hover {
-      border-color: var(--border-hover);
-      transform: scale(1.05);
+    .tag-btn:hover, .tag-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
     }
-
-    /* Alternancia de iconos según el tema activo */
-    .theme-toggle-btn .fa-sun { display: none; }
-    .theme-toggle-btn .fa-moon { display: block; }
-
-    body.dark-theme .theme-toggle-btn .fa-sun { display: block; }
-    body.dark-theme .theme-toggle-btn .fa-moon { display: none; }
 
     /* ── Upload zone ── */
     .upload-zone {
-      margin: 2.5rem auto 1.5rem;
-      max-width: 1000px;
+      margin: 2rem auto;
+      max-width: 960px;
       padding: 0 1.5rem;
     }
 
     .drop-area {
-      border: 1px dashed var(--border);
-      border-radius: 20px;
-      padding: 3.5rem 2rem;
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      background: var(--surface);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .drop-area::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.3s;
+      transition: all 0.25s;
+      background: var(--card);
     }
 
     .drop-area:hover, .drop-area.dragover {
       border-color: var(--accent);
-      transform: translateY(-2px);
-    }
-
-    .drop-area:hover::before, .drop-area.dragover::before {
-      opacity: 1;
+      background: rgba(124, 106, 247, 0.06);
     }
 
     .drop-area .icon {
-      font-size: 2rem;
-      color: var(--accent);
-      margin-bottom: 1.25rem;
-      position: relative;
-      z-index: 1;
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
     }
 
     .drop-area p {
       color: var(--muted);
-      font-size: 0.95rem;
-      position: relative;
-      z-index: 1;
+      font-size: 0.9rem;
     }
 
     .drop-area p strong {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    .drop-area .specs {
-      margin-top: 8px;
-      font-size: 0.78rem;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-      opacity: 0.8;
+      color: var(--accent);
     }
 
     #fileInput { display: none; }
 
     /* ── Stats bar ── */
     .stats-bar {
-      max-width: 1000px;
+      max-width: 960px;
       margin: 0 auto 1.5rem;
       padding: 0 1.5rem;
       display: flex;
@@ -277,15 +159,15 @@
     }
 
     .stats-bar p span {
-      color: var(--accent);
+      color: var(--accent2);
       font-weight: 500;
     }
 
     .view-toggle {
       display: flex;
-      gap: 2px;
-      background: var(--surface);
-      border-radius: 10px;
+      gap: 4px;
+      background: var(--card);
+      border-radius: 8px;
       padding: 3px;
       border: 1px solid var(--border);
     }
@@ -295,34 +177,25 @@
       border: none;
       color: var(--muted);
       cursor: pointer;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .view-btn:hover {
-      color: var(--text);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: all 0.15s;
     }
 
     .view-btn.active {
-      background: var(--bg);
-      color: var(--accent);
-      border: 1px solid var(--border);
+      background: var(--accent);
+      color: #fff;
     }
 
     /* ── Gallery Grid ── */
     .gallery {
-      max-width: 1000px;
-      margin: 0 auto 4rem;
+      max-width: 960px;
+      margin: 0 auto 3rem;
       padding: 0 1.5rem;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
       transition: all 0.3s;
     }
 
@@ -333,311 +206,234 @@
     /* ── Card ── */
     .img-card {
       background: var(--card);
-      border-radius: 16px;
+      border-radius: 14px;
       border: 1px solid var(--border);
       overflow: hidden;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      animation: cardIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
-      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      animation: cardIn 0.35s ease both;
     }
 
     @keyframes cardIn {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(12px) scale(0.97); }
       to   { opacity: 1; transform: none; }
     }
 
     .img-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--border-hover);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .img-card .thumb-wrapper {
-      width: 100%;
-      aspect-ratio: 16/11;
-      overflow: hidden;
-      background: var(--bg);
-      position: relative;
-      border-bottom: 1px solid var(--border);
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 32px rgba(124, 106, 247, 0.15);
     }
 
     .img-card .thumb {
       width: 100%;
-      height: 100%;
+      aspect-ratio: 4/3;
       object-fit: cover;
       display: block;
-      transition: transform 0.5s ease;
-    }
-
-    .img-card:hover .thumb {
-      transform: scale(1.04);
+      background: var(--surface);
     }
 
     .img-card .thumb-placeholder {
       width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, var(--surface) 0%, var(--border) 100%);
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, var(--surface) 0%, #1e2035 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
-      color: var(--muted);
+      font-size: 3rem;
     }
 
     .img-card .card-body {
-      padding: 1rem 1.25rem;
+      padding: 0.85rem 1rem;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: 0.75rem;
-    }
-
-    .img-card .card-info {
-      min-width: 0;
+      gap: 0.5rem;
     }
 
     .img-card .card-info h3 {
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 500;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: var(--text);
+      max-width: 180px;
     }
 
     .img-card .card-info p {
       font-size: 0.75rem;
       color: var(--muted);
       font-family: 'DM Mono', monospace;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     .img-card .delete-btn {
-      background: transparent;
+      background: none;
       border: none;
       color: var(--muted);
       cursor: pointer;
-      font-size: 0.9rem;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
+      font-size: 1rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.15s;
+      line-height: 1;
       flex-shrink: 0;
     }
 
-    .img-card .delete-btn:hover { 
-      color: var(--danger); 
-      background: rgba(220, 38, 38, 0.08); 
-    }
-    body.dark-theme .img-card .delete-btn:hover {
-      background: rgba(255, 77, 77, 0.1);
-    }
+    .img-card .delete-btn:hover { color: var(--danger); background: rgba(240,96,96,0.1); }
 
     /* List view card */
     .gallery.list-view .img-card {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
-      padding: 0.75rem;
+      gap: 1rem;
     }
 
-    .gallery.list-view .img-card .thumb-wrapper {
-      width: 90px;
-      height: 68px;
-      aspect-ratio: auto;
+    .gallery.list-view .img-card .thumb,
+    .gallery.list-view .img-card .thumb-placeholder {
+      width: 100px;
+      aspect-ratio: 4/3;
       flex-shrink: 0;
       border-radius: 10px;
-      border: 1px solid var(--border);
+      overflow: hidden;
     }
 
     .gallery.list-view .img-card .card-body {
       flex: 1;
-      padding: 0;
+      padding: 0.75rem 1rem 0.75rem 0;
+    }
+
+    .gallery.list-view .img-card .card-info h3 {
+      max-width: none;
     }
 
     /* ── Empty state ── */
     .empty-state {
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 4rem 1.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
       text-align: center;
     }
 
-    .empty-state .big-icon { 
-      font-size: 2.5rem; 
-      color: var(--muted); 
-      margin-bottom: 1.5rem;
-      opacity: 0.6;
-    }
-    
-    .empty-state h2 { 
-      font-family: 'Outfit', sans-serif; 
-      font-size: 1.35rem; 
-      font-weight: 500; 
-      margin-bottom: 0.5rem; 
-      color: var(--text);
-    }
-    
-    .empty-state p { 
-      color: var(--muted); 
-      font-size: 0.9rem; 
-      line-height: 1.5;
-    }
+    .empty-state .big-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .empty-state h2 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 400; margin-bottom: 0.5rem; }
+    .empty-state p { color: var(--muted); font-size: 0.9rem; }
 
     /* ── Lightbox ── */
     .lightbox {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(248, 249, 250, 0.95);
+      background: rgba(0,0,0,0.85);
       z-index: 1000;
       align-items: center;
       justify-content: center;
       padding: 2rem;
-      backdrop-filter: blur(12px);
-    }
-    body.dark-theme .lightbox {
-      background: rgba(5, 6, 8, 0.95);
+      backdrop-filter: blur(6px);
     }
 
-    .lightbox.open { display: flex; animation: fadeIn 0.25s ease; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; } to { opacity: 1; }
-    }
+    .lightbox.open { display: flex; }
 
     .lightbox img {
-      max-width: 95vw;
-      max-height: 80vh;
-      border-radius: 16px;
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 12px;
       object-fit: contain;
-      box-shadow: var(--shadow-xl);
+      box-shadow: 0 20px 80px rgba(0,0,0,0.6);
     }
 
     .lightbox-close {
       position: fixed;
       top: 1.5rem;
       right: 1.5rem;
-      background: var(--surface);
+      background: var(--card);
       border: 1px solid var(--border);
       color: var(--text);
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      font-size: 0.9rem;
+      font-size: 1.2rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .lightbox-close:hover {
-      border-color: var(--muted);
-      transform: scale(1.05);
     }
 
     .lightbox-info {
       position: fixed;
-      bottom: 2rem;
+      bottom: 1.5rem;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--surface);
+      background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 0.85rem 1.5rem;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
       font-size: 0.85rem;
       color: var(--muted);
       font-family: 'DM Mono', monospace;
       text-align: center;
-      box-shadow: var(--shadow-xl);
     }
 
-    .lightbox-info strong { 
-      color: var(--text); 
-      display: block; 
-      font-family: 'Outfit', sans-serif; 
-      font-size: 0.95rem;
-      font-weight: 500;
-      margin-bottom: 4px; 
-    }
+    .lightbox-info strong { color: var(--text); display: block; font-family: 'Outfit', sans-serif; margin-bottom: 2px; }
 
     /* ── Footer ── */
     footer {
       border-top: 1px solid var(--border);
-      padding: 2rem;
+      padding: 1.5rem 2rem;
       text-align: center;
       font-size: 0.78rem;
       color: var(--muted);
       font-family: 'DM Mono', monospace;
-      letter-spacing: 0.02em;
     }
 
-    footer a { 
-      color: var(--text); 
-      text-decoration: none; 
-      border-bottom: 1px dashed var(--muted);
-      transition: all 0.2s;
-    }
-    
-    footer a:hover {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
+    footer a { color: var(--accent2); text-decoration: none; }
   </style>
 </head>
 <body>
 
 <header>
   <div class="logo">
-    <div class="logo-icon"><i class="fa-solid fa-cloud"></i></div>
+    <div class="logo-icon">☁️</div>
     <div>
       <h1>Cloud Gallery</h1>
       <span>UPP · Cómputo en la Nube · 8vo sem.</span>
     </div>
   </div>
-  <div class="actions-nav">
-    <nav id="tagNav">
-      <button class="tag-btn active" data-tag="all">Todas</button>
-    </nav>
-    <button class="theme-toggle-btn" id="themeToggleBtn" title="Cambiar tema">
-      <i class="fa-solid fa-moon"></i>
-      <i class="fa-solid fa-sun"></i>
-    </button>
+  <nav id="tagNav">
+    <button class="tag-btn active" data-tag="all">Todas</button>
+  </nav>
+  <div style="display:flex;align-items:center;gap:0.75rem;margin-left:1rem;">
+    <span id="userBadge" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--accent2);background:rgba(70,200,160,0.1);border:1px solid rgba(70,200,160,0.25);padding:0.3rem 0.75rem;border-radius:999px;"></span>
+    <button onclick="logout()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:0.3rem 0.75rem;border-radius:999px;font-family:'Outfit',sans-serif;font-size:0.8rem;cursor:pointer;">Salir ↩</button>
   </div>
 </header>
 
 <div class="upload-zone">
   <div class="drop-area" id="dropArea">
-    <div class="icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+    <div class="icon">📤</div>
     <p>Arrastra imágenes aquí o <strong>haz clic para seleccionar</strong></p>
-    <p class="specs">JPG, PNG, GIF, WEBP · Máx. 10 MB</p>
+    <p style="margin-top:6px; font-size:0.78rem;">JPG, PNG, GIF, WEBP · Máx. 10 MB por imagen</p>
     <input type="file" id="fileInput" accept="image/*" multiple />
   </div>
 </div>
 
 <div class="stats-bar">
-  <p id="statsText"><span id="imgCount">0</span> imágenes en la galería</p>
+  <p id="statsText"><span id="imgCount">0</span> imágenes en tu galería</p>
   <div class="view-toggle">
-    <button class="view-btn active" id="gridBtn" title="Vista cuadrícula"><i class="fa-solid fa-table-cells-large"></i></button>
-    <button class="view-btn" id="listBtn" title="Vista lista"><i class="fa-solid fa-bars"></i></button>
+    <button class="view-btn active" id="gridBtn" title="Vista cuadrícula">⊞</button>
+    <button class="view-btn" id="listBtn" title="Vista lista">☰</button>
   </div>
 </div>
 
 <div class="gallery" id="gallery"></div>
-
 <div class="empty-state" id="emptyState">
-  <div class="big-icon"><i class="fa-regular fa-image"></i></div>
+  <div class="big-icon">🖼️</div>
   <h2>Tu galería está vacía</h2>
-  <p>Sube tus primeras imágenes usando la zona de arriba.<br/>Soportamos múltiples archivos simultáneos.</p>
+  <p>Sube tus primeras imágenes usando la zona de arriba.<br/>Soporta múltiples archivos a la vez.</p>
 </div>
 
 <div class="lightbox" id="lightbox">
-  <button class="lightbox-close" id="lbClose"><i class="fa-solid fa-xmark"></i></button>
+  <button class="lightbox-close" id="lbClose">✕</button>
   <img id="lbImg" src="" alt="" />
   <div class="lightbox-info">
     <strong id="lbName"></strong>
@@ -646,7 +442,7 @@
 </div>
 
 <footer>
-  Proyecto demo · <a href="https://github.com" target="_blank">Ver en GitHub</a> · Desplegado con GitHub Actions <i class="fa-solid fa-rocket" style="margin-left: 2px; font-size: 0.7rem; color: var(--accent2);"></i>
+  Proyecto demo · <a href="https://github.com" target="_blank">Ver en GitHub</a> · Desplegado con GitHub Actions 🚀
 </footer>
 
 <script>
@@ -660,26 +456,10 @@
   const lbName     = document.getElementById('lbName');
   const lbMeta     = document.getElementById('lbMeta');
   const tagNav     = document.getElementById('tagNav');
-  const themeToggleBtn = document.getElementById('themeToggleBtn');
 
   let images = JSON.parse(localStorage.getItem('cloudGallery') || '[]');
   let activeTag = 'all';
   let isListView = false;
-
-  /* ── Lógica de Cambio de Tema ── */
-  const currentTheme = localStorage.getItem('theme') || 'light';
-  if (currentTheme === 'dark') {
-    document.body.classList.add('dark-theme');
-  }
-
-  themeToggleBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-    let theme = 'light';
-    if (document.body.classList.contains('dark-theme')) {
-      theme = 'dark';
-    }
-    localStorage.setItem('theme', theme);
-  });
 
   function save() { localStorage.setItem('cloudGallery', JSON.stringify(images)); }
 
@@ -728,26 +508,22 @@
 
     gallery.innerHTML = filtered.map((img, idx) => `
       <div class="img-card" data-idx="${images.indexOf(img)}">
-        <div class="thumb-wrapper">
-          ${img.src
-            ? `<img class="thumb" src="${img.src}" alt="${img.name}" loading="lazy" />`
-            : `<div class="thumb-placeholder"><i class="fa-regular fa-image"></i></div>`}
-        </div>
+        ${img.src
+          ? `<img class="thumb" src="${img.src}" alt="${img.name}" loading="lazy" />`
+          : `<div class="thumb-placeholder">🖼️</div>`}
         <div class="card-body">
           <div class="card-info">
             <h3>${img.name}</h3>
             <p>${formatSize(img.size)} · ${img.tag} · ${img.date}</p>
           </div>
-          <button class="delete-btn" data-idx="${images.indexOf(img)}" title="Eliminar">
-            <i class="fa-regular fa-trash-can"></i>
-          </button>
+          <button class="delete-btn" data-idx="${images.indexOf(img)}" title="Eliminar">🗑</button>
         </div>
       </div>
     `).join('');
 
     gallery.querySelectorAll('.img-card').forEach(card => {
       card.addEventListener('click', e => {
-        if (e.target.closest('.delete-btn')) return;
+        if (e.target.classList.contains('delete-btn')) return;
         const idx = card.dataset.idx;
         openLightbox(images[idx]);
       });
@@ -756,7 +532,7 @@
     gallery.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();
-        const idx = parseInt(btn.closest('.delete-btn').dataset.idx);
+        const idx = parseInt(btn.dataset.idx);
         images.splice(idx, 1);
         save();
         renderGallery();
@@ -820,6 +596,13 @@
   });
 
   renderGallery();
+
+  // Mostrar usuario en header
+  const session = getSession();
+  if (session) {
+    const badge = document.getElementById("userBadge");
+    if (badge) badge.textContent = session.role === "admin" ? "👑 " + session.name : "👤 " + session.name;
+  }
 </script>
 </body>
 </html>
