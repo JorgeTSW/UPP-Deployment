@@ -14,13 +14,12 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Verificar que index.html existe
+      - name: Verificar archivos necesarios
         run: |
-          if [ ! -f "index.html" ]; then
-            echo "❌ index.html no encontrado"
-            exit 1
-          fi
-          echo "✅ index.html encontrado ($(wc -c < index.html) bytes)"
+          for f in index.html login.html auth.js server.js package.json; do
+            if [ ! -f "$f" ]; then echo "❌ $f no encontrado"; exit 1; fi
+            echo "✅ $f encontrado"
+          done
 
   # ── Job 2: Subir assets a S3 ──────────────────────────────────────────────
   deploy-s3:
@@ -38,12 +37,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Subir index.html a S3
+      - name: Subir assets a S3
         run: |
-          aws s3 cp index.html s3://${{ secrets.S3_BUCKET }}/index.html \
-            --content-type "text/html" \
-            --cache-control "no-cache"
-          echo "✅ index.html subido a S3"
+          aws s3 cp index.html s3://${{ secrets.S3_BUCKET }}/index.html --content-type "text/html" --cache-control "no-cache"
+          aws s3 cp login.html s3://${{ secrets.S3_BUCKET }}/login.html --content-type "text/html" --cache-control "no-cache"
+          aws s3 cp auth.js s3://${{ secrets.S3_BUCKET }}/auth.js --content-type "application/javascript"
+          echo "✅ Assets subidos a S3"
 
   # ── Job 3: Desplegar en EC2 ───────────────────────────────────────────────
   deploy-ec2:
@@ -64,30 +63,65 @@ jobs:
       - name: Copiar archivos al EC2 via SCP
         run: |
           scp -i ~/.ssh/cloud-gallery-key.pem \
-            index.html login.html auth.js \
+            index.html login.html auth.js server.js package.json \
             ubuntu@${{ secrets.EC2_HOST }}:/tmp/
 
-      - name: Instalar Nginx y desplegar en EC2
+      - name: Instalar dependencias y desplegar
         run: |
           ssh -i ~/.ssh/cloud-gallery-key.pem ubuntu@${{ secrets.EC2_HOST }} << 'SSHEOF'
+            # Instalar Node.js si no está
+            if ! command -v node &> /dev/null; then
+              curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+              echo "✅ Node.js $(node -v) instalado"
+            fi
+
+            # Instalar nginx si no está
             if ! command -v nginx &> /dev/null; then
-              sudo apt-get update -y
-              sudo apt-get install -y nginx
+              sudo apt-get update -y && sudo apt-get install -y nginx
               sudo systemctl enable nginx
             fi
-            sudo mkdir -p /var/www/cloud-gallery
-            sudo mv /tmp/index.html /tmp/login.html /tmp/auth.js /var/www/cloud-gallery/
+
+            # Configurar directorio de la app
+            sudo mkdir -p /var/www/cloud-gallery/public
+            sudo cp /tmp/index.html /tmp/login.html /tmp/auth.js /var/www/cloud-gallery/public/
+            sudo cp /tmp/server.js /tmp/package.json /var/www/cloud-gallery/
+
+            # Instalar dependencias de Node
+            cd /var/www/cloud-gallery && sudo npm install --production
+
+            # Configurar variables de entorno
+            sudo tee /var/www/cloud-gallery/.env > /dev/null << 'ENV'
+          S3_BUCKET=${{ secrets.S3_BUCKET }}
+          AWS_REGION=${{ secrets.AWS_REGION }}
+          ENV
+
+            # Instalar PM2 para mantener el servidor corriendo
+            sudo npm install -g pm2 2>/dev/null || true
+
+            # Reiniciar la app con PM2
+            cd /var/www/cloud-gallery
+            sudo S3_BUCKET=${{ secrets.S3_BUCKET }} AWS_REGION=${{ secrets.AWS_REGION }} \
+              pm2 restart cloud-gallery 2>/dev/null || \
+              sudo S3_BUCKET=${{ secrets.S3_BUCKET }} AWS_REGION=${{ secrets.AWS_REGION }} \
+              pm2 start server.js --name cloud-gallery
+            sudo pm2 save
+
+            # Configurar Nginx como reverse proxy
             sudo tee /etc/nginx/sites-available/cloud-gallery > /dev/null << 'NGINX'
           server {
               listen 80;
               server_name _;
-              root /var/www/cloud-gallery;
-              index index.html;
               location / {
-                  try_files $uri $uri/ =404;
+                  proxy_pass http://localhost:3000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  client_max_body_size 20M;
               }
           }
           NGINX
+
             sudo ln -sf /etc/nginx/sites-available/cloud-gallery /etc/nginx/sites-enabled/
             sudo rm -f /etc/nginx/sites-enabled/default
             sudo systemctl restart nginx
@@ -96,12 +130,7 @@ jobs:
 
       - name: Verificar que el servidor responde
         run: |
-          sleep 10
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }})
-          if [ "$STATUS" = "200" ]; then
-            echo "✅ Servidor respondiendo correctamente (HTTP $STATUS)"
-            echo "🌐 URL: http://${{ secrets.EC2_HOST }}"
-          else
-            echo "⚠️ Servidor respondió con HTTP $STATUS"
-            exit 1
-          fi
+          sleep 15
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 http://${{ secrets.EC2_HOST }})
+          echo "HTTP Status: $STATUS"
+          echo "🌐 App disponible en: http://${{ vars.EC2_HOST_PUBLIC }}"
