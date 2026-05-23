@@ -8,21 +8,44 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <style>
+    /* ── Variables Base: Tema Claro ── */
     :root {
-      /* Tema Claro - Colores Institucionales UPP */
-      --bg: #f8f9fa;              /* Blanco grisáceo muy claro para el fondo general */
-      --surface: #ffffff;         /* Blanco puro para zonas de interfaz */
-      --card: #ffffff;            /* Tarjetas en fondo blanco */
-      --border: #e2e8f0;          /* Bordes claros y sutiles */
-      --border-hover: #cbd5e1;    /* Borde más oscuro al pasar el cursor */
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --border-hover: #cbd5e1;
       
       --accent: #4169e1;          /* Azul Rey Institucional */
-      --accent-glow: rgba(65, 105, 225, 0.08); /* Brillo Azul Rey atenuado para fondo claro */
-      --accent2: #e63946;         /* Rojo Institucional para acentos secundarios */
+      --accent-glow: rgba(65, 105, 225, 0.08);
+      --accent2: #e63946;         /* Rojo Institucional */
       
-      --text: #0f172a;            /* Negro pizarra oscuro para alta legibilidad */
-      --muted: #64748b;           /* Gris medio para textos secundarios y detalles */
-      --danger: #dc2626;          /* Rojo oscuro/vibrante para eliminar/alertas en modo claro */
+      --text: #0f172a;
+      --muted: #64748b;
+      --danger: #dc2626;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.03);
+      --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.06);
+      --shadow-xl: 0 24px 50px rgba(0, 0, 0, 0.12);
+    }
+
+    /* ── Variables Alternativas: Tema Oscuro ── */
+    body.dark-theme {
+      --bg: #0b0c10;
+      --surface: #121520;
+      --card: #181c2b;
+      --border: #232a42;
+      --border-hover: #3b476e;
+      
+      --accent-glow: rgba(65, 105, 225, 0.15);
+      
+      --text: #ffffff;
+      --muted: #8a94a6;
+      --danger: #ff4d4d;
+      --shadow-sm: none;
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
+      --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.6);
+      --shadow-xl: 0 24px 70px rgba(0, 0, 0, 0.8);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,6 +56,7 @@
       font-family: 'Outfit', sans-serif;
       min-height: 100vh;
       letter-spacing: -0.01em;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
 
     /* ── Header ── */
@@ -42,12 +66,23 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
+      background: var(--surface);
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Desenfoque de fondo sólo si el navegador lo soporta, adaptado a opacidad de cada tema */
+    @supports (backdrop-filter: blur(12px)) {
+      header {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+      }
+      body.dark-theme header {
+        background: rgba(18, 21, 32, 0.8);
+        backdrop-filter: blur(12px);
+      }
     }
 
     .logo {
@@ -66,7 +101,7 @@
       justify-content: center;
       font-size: 16px;
       color: #fff;
-      box-shadow: 0 4px 12px rgba(65, 105, 225, 0.2);
+      box-shadow: var(--shadow-md);
     }
 
     .logo h1 {
@@ -87,6 +122,12 @@
       margin-top: 1px;
       letter-spacing: 0.05em;
       text-transform: uppercase;
+    }
+
+    .actions-nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
     nav {
@@ -119,9 +160,38 @@
       background: var(--surface);
       color: var(--accent);
       font-weight: 600;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: var(--shadow-sm);
       border: 1px solid var(--border);
     }
+
+    /* Botón Conmutador de Tema */
+    .theme-toggle-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--border-hover);
+      transform: scale(1.05);
+    }
+
+    /* Alternancia de iconos según el tema activo */
+    .theme-toggle-btn .fa-sun { display: none; }
+    .theme-toggle-btn .fa-moon { display: block; }
+
+    body.dark-theme .theme-toggle-btn .fa-sun { display: block; }
+    body.dark-theme .theme-toggle-btn .fa-moon { display: none; }
 
     /* ── Upload zone ── */
     .upload-zone {
@@ -140,7 +210,6 @@
       background: var(--surface);
       position: relative;
       overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.01);
     }
 
     .drop-area::before {
@@ -155,7 +224,6 @@
     .drop-area:hover, .drop-area.dragover {
       border-color: var(--accent);
       transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(65, 105, 225, 0.05);
     }
 
     .drop-area:hover::before, .drop-area.dragover::before {
@@ -271,7 +339,7 @@
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       animation: cardIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      box-shadow: var(--shadow-sm);
     }
 
     @keyframes cardIn {
@@ -282,7 +350,7 @@
     .img-card:hover {
       transform: translateY(-4px);
       border-color: var(--border-hover);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+      box-shadow: var(--shadow-lg);
     }
 
     .img-card .thumb-wrapper {
@@ -309,7 +377,7 @@
     .img-card .thumb-placeholder {
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, var(--surface) 0%, #f1f5f9 100%);
+      background: linear-gradient(135deg, var(--surface) 0%, var(--border) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -364,6 +432,9 @@
     .img-card .delete-btn:hover { 
       color: var(--danger); 
       background: rgba(220, 38, 38, 0.08); 
+    }
+    body.dark-theme .img-card .delete-btn:hover {
+      background: rgba(255, 77, 77, 0.1);
     }
 
     /* List view card */
@@ -429,6 +500,9 @@
       padding: 2rem;
       backdrop-filter: blur(12px);
     }
+    body.dark-theme .lightbox {
+      background: rgba(5, 6, 8, 0.95);
+    }
 
     .lightbox.open { display: flex; animation: fadeIn 0.25s ease; }
 
@@ -441,7 +515,7 @@
       max-height: 80vh;
       border-radius: 16px;
       object-fit: contain;
-      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.12);
+      box-shadow: var(--shadow-xl);
     }
 
     .lightbox-close {
@@ -460,7 +534,6 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
     .lightbox-close:hover {
@@ -481,7 +554,7 @@
       color: var(--muted);
       font-family: 'DM Mono', monospace;
       text-align: center;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      box-shadow: var(--shadow-xl);
     }
 
     .lightbox-info strong { 
@@ -527,9 +600,15 @@
       <span>UPP · Cómputo en la Nube · 8vo sem.</span>
     </div>
   </div>
-  <nav id="tagNav">
-    <button class="tag-btn active" data-tag="all">Todas</button>
-  </nav>
+  <div class="actions-nav">
+    <nav id="tagNav">
+      <button class="tag-btn active" data-tag="all">Todas</button>
+    </nav>
+    <button class="theme-toggle-btn" id="themeToggleBtn" title="Cambiar tema">
+      <i class="fa-solid fa-moon"></i>
+      <i class="fa-solid fa-sun"></i>
+    </button>
+  </div>
 </header>
 
 <div class="upload-zone">
@@ -581,10 +660,26 @@
   const lbName     = document.getElementById('lbName');
   const lbMeta     = document.getElementById('lbMeta');
   const tagNav     = document.getElementById('tagNav');
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
 
   let images = JSON.parse(localStorage.getItem('cloudGallery') || '[]');
   let activeTag = 'all';
   let isListView = false;
+
+  /* ── Lógica de Cambio de Tema ── */
+  const currentTheme = localStorage.getItem('theme') || 'light';
+  if (currentTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+  }
+
+  themeToggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-theme');
+    let theme = 'light';
+    if (document.body.classList.contains('dark-theme')) {
+      theme = 'dark';
+    }
+    localStorage.setItem('theme', theme);
+  });
 
   function save() { localStorage.setItem('cloudGallery', JSON.stringify(images)); }
 
