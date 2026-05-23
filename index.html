@@ -9,20 +9,20 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <style>
     :root {
-      /* Colores Institucionales UPP Adaptados */
-      --bg: #0b0c10;              /* Negro profundo para fondo general */
-      --surface: #121520;         /* Negro suavizado para zonas de interfaz */
-      --card: #181c2b;            /* Variación oscura para las tarjetas */
-      --border: #232a42;          /* Bordes en tono oscuro sutil */
-      --border-hover: #3b476e;    /* Borde resaltado al pasar el cursor */
+      /* Tema Claro - Colores Institucionales UPP */
+      --bg: #f8f9fa;              /* Blanco grisáceo muy claro para el fondo general */
+      --surface: #ffffff;         /* Blanco puro para zonas de interfaz */
+      --card: #ffffff;            /* Tarjetas en fondo blanco */
+      --border: #e2e8f0;          /* Bordes claros y sutiles */
+      --border-hover: #cbd5e1;    /* Borde más oscuro al pasar el cursor */
       
       --accent: #4169e1;          /* Azul Rey Institucional */
-      --accent-glow: rgba(65, 105, 225, 0.15); /* Brillo Azul Rey */
+      --accent-glow: rgba(65, 105, 225, 0.08); /* Brillo Azul Rey atenuado para fondo claro */
       --accent2: #e63946;         /* Rojo Institucional para acentos secundarios */
       
-      --text: #ffffff;            /* Blanco para textos principales */
-      --muted: #8a94a6;           /* Gris/Blanco atenuado para secundarios */
-      --danger: #ff4d4d;          /* Rojo vibrante para eliminar/alertas */
+      --text: #0f172a;            /* Negro pizarra oscuro para alta legibilidad */
+      --muted: #64748b;           /* Gris medio para textos secundarios y detalles */
+      --danger: #dc2626;          /* Rojo oscuro/vibrante para eliminar/alertas en modo claro */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -42,11 +42,12 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--border);
-      background: rgba(18, 21, 32, 0.8);
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
       z-index: 100;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     }
 
     .logo {
@@ -58,14 +59,14 @@
     .logo-icon {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2)); /* Degradado Azul Rey a Rojo UPP */
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 16px;
       color: #fff;
-      box-shadow: 0 4px 12px rgba(65, 105, 225, 0.3);
+      box-shadow: 0 4px 12px rgba(65, 105, 225, 0.2);
     }
 
     .logo h1 {
@@ -73,7 +74,7 @@
       font-size: 1.5rem;
       font-weight: 400;
       letter-spacing: -0.01em;
-      background: linear-gradient(to right, #fff, #bdf);
+      background: linear-gradient(to right, var(--text), var(--accent));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -81,7 +82,7 @@
     .logo span {
       font-family: 'DM Mono', monospace;
       font-size: 0.72rem;
-      color: var(--accent2); /* Resaltado en Rojo */
+      color: var(--accent2);
       display: block;
       margin-top: 1px;
       letter-spacing: 0.05em;
@@ -91,7 +92,7 @@
     nav {
       display: flex;
       gap: 0.6rem;
-      background: var(--surface);
+      background: var(--bg);
       padding: 4px;
       border-radius: 999px;
       border: 1px solid var(--border);
@@ -115,10 +116,11 @@
     }
 
     .tag-btn.active {
-      background: var(--text); /* Botón activo en blanco */
-      color: var(--bg);        /* Texto en negro */
+      background: var(--surface);
+      color: var(--accent);
       font-weight: 600;
-      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border);
     }
 
     /* ── Upload zone ── */
@@ -138,6 +140,7 @@
       background: var(--surface);
       position: relative;
       overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.01);
     }
 
     .drop-area::before {
@@ -150,8 +153,9 @@
     }
 
     .drop-area:hover, .drop-area.dragover {
-      border-color: var(--accent); /* Resaltado en Azul Rey */
+      border-color: var(--accent);
       transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(65, 105, 225, 0.05);
     }
 
     .drop-area:hover::before, .drop-area.dragover::before {
@@ -160,7 +164,7 @@
 
     .drop-area .icon {
       font-size: 2rem;
-      color: var(--accent); /* Icono en Azul Rey */
+      color: var(--accent);
       margin-bottom: 1.25rem;
       position: relative;
       z-index: 1;
@@ -205,7 +209,7 @@
     }
 
     .stats-bar p span {
-      color: var(--accent); /* Contador en Azul Rey */
+      color: var(--accent);
       font-weight: 500;
     }
 
@@ -238,8 +242,8 @@
     }
 
     .view-btn.active {
-      background: var(--card);
-      color: var(--accent); /* Icono activo en Azul Rey */
+      background: var(--bg);
+      color: var(--accent);
       border: 1px solid var(--border);
     }
 
@@ -267,6 +271,7 @@
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       animation: cardIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
     }
 
     @keyframes cardIn {
@@ -277,15 +282,16 @@
     .img-card:hover {
       transform: translateY(-4px);
       border-color: var(--border-hover);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
     }
 
     .img-card .thumb-wrapper {
       width: 100%;
       aspect-ratio: 16/11;
       overflow: hidden;
-      background: var(--surface);
+      background: var(--bg);
       position: relative;
+      border-bottom: 1px solid var(--border);
     }
 
     .img-card .thumb {
@@ -303,7 +309,7 @@
     .img-card .thumb-placeholder {
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, var(--surface) 0%, #1c2236 100%);
+      background: linear-gradient(135deg, var(--surface) 0%, #f1f5f9 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -357,7 +363,7 @@
 
     .img-card .delete-btn:hover { 
       color: var(--danger); 
-      background: rgba(255, 77, 77, 0.1); 
+      background: rgba(220, 38, 38, 0.08); 
     }
 
     /* List view card */
@@ -374,6 +380,7 @@
       aspect-ratio: auto;
       flex-shrink: 0;
       border-radius: 10px;
+      border: 1px solid var(--border);
     }
 
     .gallery.list-view .img-card .card-body {
@@ -415,7 +422,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(5, 6, 8, 0.95);
+      background: rgba(248, 249, 250, 0.95);
       z-index: 1000;
       align-items: center;
       justify-content: center;
@@ -434,14 +441,14 @@
       max-height: 80vh;
       border-radius: 16px;
       object-fit: contain;
-      box-shadow: 0 24px 70px rgba(0,0,0,0.8);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.12);
     }
 
     .lightbox-close {
       position: fixed;
       top: 1.5rem;
       right: 1.5rem;
-      background: var(--card);
+      background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
       width: 44px;
@@ -453,6 +460,7 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
     .lightbox-close:hover {
@@ -465,7 +473,7 @@
       bottom: 2rem;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--card);
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 0.85rem 1.5rem;
@@ -473,7 +481,7 @@
       color: var(--muted);
       font-family: 'DM Mono', monospace;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     }
 
     .lightbox-info strong { 
