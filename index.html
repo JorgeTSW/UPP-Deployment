@@ -3,38 +3,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Materia</title>
+  <title>Portada - Arquitectura de Software</title>
   <style>
+    :root {
+      --navy: #0B1B3D;
+      --cyan: #00D2D3;
+      --black: #1E272E;
+      --white: #FFFFFF;
+      --gray: #F4F6F9;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: system-ui, -apple-system, sans-serif;
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #0f172a;
-      color: #f8fafc;
-      min-height: 100vh;
+      background-color: #E2E8F0;
       display: flex;
       justify-content: center;
       align-items: center;
-      text-align: center;
-      padding: 1rem;
+      min-height: 100vh;
+      padding: 20px;
     }
 
-    h1 {
-      font-size: clamp(2rem, 8vw, 4.5rem);
+    .page {
+      background: var(--white);
+      width: 210mm;
+      min-height: 297mm;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-top: 10px solid var(--navy);
+      border-bottom: 10px solid var(--cyan);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--gray);
+      padding-bottom: 20px;
+    }
+
+    .institution {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: 1px;
+    }
+
+    .badge {
+      background: var(--navy);
+      color: var(--cyan);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.85rem;
       font-weight: 700;
-      letter-spacing: -0.025em;
-      line-height: 1.1;
+    }
+
+    .content {
+      text-align: center;
+      margin: 40px 0;
+    }
+
+    .subtitle {
+      color: var(--cyan);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      color: var(--navy);
+      font-size: 2.5rem;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 40px;
+    }
+
+    .diagram {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin: 30px auto;
+      max-width: 500px;
+    }
+
+    .node {
+      border: 2px solid var(--navy);
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: var(--black);
+      background: var(--white);
+      font-size: 0.9rem;
+    }
+
+    .node.active {
+      background: var(--navy);
+      color: var(--white);
+      border-color: var(--navy);
+    }
+
+    .arrow {
+      color: var(--cyan);
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .footer-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      background: var(--gray);
+      padding: 25px;
+      border-radius: 8px;
+      border-left: 5px solid var(--cyan);
+    }
+
+    .info-group h3 {
+      font-size: 0.75rem;
+      color: var(--cyan);
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .info-group p {
+      font-size: 0.95rem;
+      color: var(--black);
+      font-weight: 600;
+    }
+
+    @media print {
+      body { background: none; padding: 0; }
+      .page { box-shadow: none; width: 100%; height: 100vh; }
     }
   </style>
 </head>
 <body>
 
-  <h1>Arquitectura de Software</h1>
-  <p>Pruebas de despliegue</p>
+  <div class="page">
+    <header class="header">
+      <div class="institution">TECNOLÓGICO DE SOFTWARE</div>
+      <div class="badge">INGENIERÍA</div>
+    </header>
+
+    <main class="content">
+      <p class="subtitle">MATERIA</p>
+      <h1 class="title">ARQUITECTURA DE SOFTWARE</h1>
+
+      <div class="diagram">
+        <div class="node">Cliente</div>
+        <div class="arrow">➔</div>
+        <div class="node active">API Gateway</div>
+        <div class="arrow">➔</div>
+        <div class="node">Microservicios</div>
+      </div>
+    </main>
+
+    <footer class="footer-info">
+      <div class="info-group">
+        <h3>ALUMNO</h3>
+        <p>Tu Nombre Aquí</p>
+      </div>
+      <div class="info-group">
+        <h3>DOCENTE</h3>
+        <p>Nombre del Profesor</p>
+      </div>
+      <div class="info-group">
+        <h3>CARRERA</h3>
+        <p>Ingeniería de Software</p>
+      </div>
+      <div class="info-group">
+        <h3>FECHA / CICLO</h3>
+        <p>2026</p>
+      </div>
+    </footer>
+  </div>
 
 </body>
 </html>
