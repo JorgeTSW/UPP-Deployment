@@ -11,6 +11,7 @@
       --black: #1E272E;
       --white: #FFFFFF;
       --gray: #F4F6F9;
+      --green: #10B981;
     }
 
     * {
@@ -69,7 +70,7 @@
 
     .content {
       text-align: center;
-      margin: 40px 0;
+      margin: 30px 0;
     }
 
     .subtitle {
@@ -82,29 +83,29 @@
 
     .title {
       color: var(--navy);
-      font-size: 2.5rem;
+      font-size: 2.3rem;
       font-weight: 900;
       line-height: 1.2;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
 
     .diagram {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 15px;
-      margin: 30px auto;
-      max-width: 500px;
+      gap: 12px;
+      margin: 20px auto;
+      max-width: 550px;
     }
 
     .node {
       border: 2px solid var(--navy);
-      padding: 12px 20px;
+      padding: 10px 16px;
       border-radius: 6px;
       font-weight: 600;
       color: var(--black);
       background: var(--white);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     .node.active {
@@ -116,7 +117,30 @@
     .arrow {
       color: var(--cyan);
       font-weight: bold;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
+    }
+
+    .cicd-status {
+      margin-top: 30px;
+      background: #E6FFFA;
+      border: 1px solid var(--cyan);
+      padding: 15px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .cicd-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .cicd-result {
+      color: var(--green);
+      font-weight: 700;
+      font-size: 0.95rem;
     }
 
     .footer-info {
@@ -131,9 +155,10 @@
 
     .info-group h3 {
       font-size: 0.75rem;
-      color: var(--cyan);
+      color: var(--navy);
       letter-spacing: 1px;
       margin-bottom: 4px;
+      font-weight: 800;
     }
 
     .info-group p {
@@ -161,30 +186,35 @@
       <h1 class="title">ARQUITECTURA DE SOFTWARE</h1>
 
       <div class="diagram">
-        <div class="node">Cliente</div>
+        <div class="node">Compu Orion</div>
         <div class="arrow">➔</div>
         <div class="node active">API Gateway</div>
         <div class="arrow">➔</div>
         <div class="node">Microservicios</div>
+      </div>
+
+      <div class="cicd-status">
+        <div class="cicd-title">RESULTADO DEL CI/CD</div>
+        <div class="cicd-result">✔ Pipeline Executed Successfully (Passed)</div>
       </div>
     </main>
 
     <footer class="footer-info">
       <div class="info-group">
         <h3>ALUMNO</h3>
-        <p>Tu Nombre Aquí</p>
+        <p>Orion</p>
       </div>
       <div class="info-group">
-        <h3>DOCENTE</h3>
-        <p>Nombre del Profesor</p>
+        <h3>ORIGEN</h3>
+        <p>Vista desde la compu del alumno Orion</p>
       </div>
       <div class="info-group">
-        <h3>CARRERA</h3>
-        <p>Ingeniería de Software</p>
+        <h3>ESTADO INTEGRACIÓN</h3>
+        <p>Resultado del CI/CD: Exitoso</p>
       </div>
       <div class="info-group">
-        <h3>FECHA / CICLO</h3>
-        <p>2026</p>
+        <h3>CARRERA / CICLO</h3>
+        <p>Ingeniería de Software - 2026</p>
       </div>
     </footer>
   </div>
